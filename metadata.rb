@@ -9,13 +9,13 @@ recipe            'git', 'Installs git'
 recipe            'git::server', 'Sets up a runit_service for git daemon'
 recipe            'git::source', 'Installs git from source'
 
-%w{ amazon arch centos debian fedora redhat scientific oracle amazon ubuntu windows freebsd}.each do |os|
+%w(amazon arch centos debian fedora redhat scientific oracle amazon ubuntu windows freebsd).each do |os|
   supports os
 end
 
 supports 'mac_os_x', '>= 10.6.0'
 
-%w{ dmg windows }.each do |cookbook|
+%w(dmg windows).each do |cookbook|
   depends cookbook
 end
 
@@ -35,6 +35,6 @@ attribute 'git/server/base_path',
 attribute 'git/server/export_all',
           :display_name => 'Git Daemon Export All',
           :description => 'Adds the --export-all option to the git-daemon parameters, making all repositories publicly readable even if they lack the \'git-daemon-export-ok\' file',
-          :choice => %w{ true false },
+          :choice => %w(true false),
           :default => 'true',
           :recipes => ['git::server']

@@ -27,16 +27,16 @@ case node['platform_family']
 when 'rhel'
   case node['platform_version'].to_i
   when 5
-    pkgs = %w{ expat-devel gettext-devel curl-devel openssl-devel zlib-devel }
+    pkgs = %w(expat-devel gettext-devel curl-devel openssl-devel zlib-devel)
   when 6
-    pkgs = %w{ expat-devel gettext-devel libcurl-devel openssl-devel perl-ExtUtils-MakeMaker zlib-devel }
+    pkgs = %w(expat-devel gettext-devel libcurl-devel openssl-devel perl-ExtUtils-MakeMaker zlib-devel)
   else
-    pkgs = %w{ expat-devel gettext-devel curl-devel openssl-devel perl-ExtUtils-MakeMaker zlib-devel } if node['platform'] == 'amazon'
+    pkgs = %w(expat-devel gettext-devel curl-devel openssl-devel perl-ExtUtils-MakeMaker zlib-devel) if node['platform'] == 'amazon'
   end
 when 'debian'
-  pkgs = %w{ libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev }
+  pkgs = %w(libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev)
 when 'freebsd'
-  pkgs = %w{ openssl curl }
+  pkgs = %w(openssl curl)
 end
 
 pkgs.each do |pkg|
@@ -52,9 +52,9 @@ remote_file "#{Chef::Config['file_cache_path']}/git-#{node['git']['version']}.ta
 end
 
 if node['platform_family'] == 'freebsd'
-  make = "gmake"
+  make = 'gmake'
 else
-  make = "make"
+  make = 'make'
 end
 
 # reduce line-noise-eyness

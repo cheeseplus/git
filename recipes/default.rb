@@ -41,6 +41,9 @@ when 'mac_os_x'
     type 'pkg'
     action :install
   end
+when 'freebsd'
+  include_recipe 'freebsd::portsnap'
+  package 'git'
 else
   package 'git' do
     package_name case node['platform']

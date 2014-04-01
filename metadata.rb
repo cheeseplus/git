@@ -9,19 +9,22 @@ recipe            'git', 'Installs git'
 recipe            'git::server', 'Sets up a runit_service for git daemon'
 recipe            'git::source', 'Installs git from source'
 
-%w{ amazon arch centos debian fedora redhat scientific oracle amazon ubuntu windows }.each do |os|
+%w{ amazon arch centos debian fedora redhat scientific oracle amazon ubuntu windows freebsd}.each do |os|
   supports os
 end
 
 supports 'mac_os_x', '>= 10.6.0'
 
-%w{ dmg build-essential windows }.each do |cookbook|
+%w{ dmg windows }.each do |cookbook|
   depends cookbook
 end
 
+depends 'build-essential', '~> 2.0.0'
 depends 'runit', '>= 1.0'
 depends 'yum', '~> 3.0'
 depends 'yum-epel'
+depends 'freebsd', '~> 0.1.2'
+depends 'line'
 
 attribute 'git/server/base_path',
           :display_name => 'Git Daemon Base Path',

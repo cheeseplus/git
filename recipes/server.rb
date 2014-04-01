@@ -24,6 +24,7 @@ directory node['git']['server']['base_path'] do
   owner 'root'
   group 'root'
   mode 00755
+  recursive true
 end
 
 case node['platform_family']
@@ -31,26 +32,40 @@ when 'debian'
   package 'xinetd'
 when 'rhel'
   package 'git-daemon'
+when 'debian','rhel'
+  template '/etc/xinetd.d/git' do
+    backup false
+    source 'git-xinetd.d.erb'
+    owner 'root'
+    group 'root'
+    mode 00644
+    variables(
+      :git_daemon_binary => value_for_platform_family(
+        'debian' => '/usr/lib/git-core/git-daemon',
+        'rhel' => '/usr/libexec/git-core/git-daemon'
+        )
+      )
+  end
+
+  service 'xinetd' do
+    action [:enable, :restart]
+  end
+when 'freebsd'
+  append_if_no_line "git_daemon_directory" do
+    path "/etc/rc.conf"
+    line "git_daemon_directory=#{node["git"]["server"]["base_path"]}"
+  end
+
+  append_if_no_line "git_daemon_flags" do
+    path "/etc/rc.conf"
+    line "git_daemon_flags=--base-path=#{node["git"]["server"]["base_path"]} --syslog --detach --reuseaddr --export-all"
+  end
+
+  service 'git_daemon' do
+    action [:enable, :restart]
+  end
 else
   log 'Platform requires setting up a git daemon service script.'
   log "Hint: /usr/bin/git daemon --export-all --user=nobody --group=daemon --base-path=#{node['git']['server']['base_path']}"
   return
-end
-
-template '/etc/xinetd.d/git' do
-  backup false
-  source 'git-xinetd.d.erb'
-  owner 'root'
-  group 'root'
-  mode 00644
-  variables(
-    :git_daemon_binary => value_for_platform_family(
-      'debian' => '/usr/lib/git-core/git-daemon',
-      'rhel' => '/usr/libexec/git-core/git-daemon'
-      )
-    )
-end
-
-service 'xinetd' do
-  action [:enable, :restart]
 end

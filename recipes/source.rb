@@ -18,6 +18,7 @@
 
 return "#{node['platform']} is not supported by the #{cookbook_name}::#{recipe_name} recipe" if node['platform'] == 'windows'
 
+include_recipe 'freebsd::portsnap' if node['platform_family'] == 'freebsd'
 include_recipe 'build-essential'
 include_recipe 'yum-epel' if node['platform_family'] == 'rhel' && node['platform_version'].to_i < 6
 
@@ -34,6 +35,8 @@ when 'rhel'
   end
 when 'debian'
   pkgs = %w{ libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev }
+when 'freebsd'
+  pkgs = %w{ openssl curl }
 end
 
 pkgs.each do |pkg|
@@ -48,12 +51,18 @@ remote_file "#{Chef::Config['file_cache_path']}/git-#{node['git']['version']}.ta
   not_if "test -f #{Chef::Config['file_cache_path']}/git-#{node['git']['version']}.tar.gz"
 end
 
+if node['platform_family'] == 'freebsd'
+  make = "gmake"
+else
+  make = "make"
+end
+
 # reduce line-noise-eyness
 execute "Extracting and Building Git #{node['git']['version']} from Source" do
   cwd Chef::Config['file_cache_path']
   command <<-COMMAND
     (mkdir git-#{node['git']['version']} && tar -zxf git-#{node['git']['version']}.tar.gz -C git-#{node['git']['version']} --strip-components 1)
-    (cd git-#{node['git']['version']} && make prefix=#{node['git']['prefix']} install)
+    (cd git-#{node['git']['version']} && #{make} prefix=#{node['git']['prefix']} install)
   COMMAND
   creates "#{node['git']['prefix']}/bin/git"
   not_if "git --version | grep #{node['git']['version']}"

@@ -32,7 +32,7 @@ when 'debian'
   package 'xinetd'
 when 'rhel'
   package 'git-daemon'
-when 'debian', 'rhel'
+when 'debian','rhel'
   template '/etc/xinetd.d/git' do
     backup false
     source 'git-xinetd.d.erb'
@@ -51,13 +51,13 @@ when 'debian', 'rhel'
     action [:enable, :restart]
   end
 when 'freebsd'
-  append_if_no_line 'git_daemon_directory' do
-    path '/etc/rc.conf'
+  append_if_no_line "git_daemon_directory" do
+    path "/etc/rc.conf"
     line "git_daemon_directory=#{node["git"]["server"]["base_path"]}"
   end
 
-  append_if_no_line 'git_daemon_flags' do
-    path '/etc/rc.conf'
+  append_if_no_line "git_daemon_flags" do
+    path "/etc/rc.conf"
     line "git_daemon_flags=--base-path=#{node["git"]["server"]["base_path"]} --syslog --detach --reuseaddr --export-all"
   end
 
